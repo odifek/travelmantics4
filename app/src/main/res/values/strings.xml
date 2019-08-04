@@ -5,4 +5,5 @@
     <string name="description">Description</string>
     <string name="hint_deal_price">Price</string>
     <string name="upload_image">Upload Image</string>
+    <string name="save">Save</string>
 </resources>
