@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Travelmantics 4 Odife</string>
+    <string name="description_deal_image">Deal Image</string>
+    <string name="deal_title">Title</string>
+    <string name="description">Description</string>
+    <string name="hint_deal_price">Price</string>
+    <string name="upload_image">Upload Image</string>
 </resources>
