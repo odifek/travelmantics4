@@ -61,7 +61,7 @@
                 android:drawableTint="@color/colorAccent"
                 android:ems="10"
                 android:hint="@string/hint_deal_price"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:minHeight="48dp"
                 app:layout_constraintEnd_toEndOf="@+id/editText_deal_title"
                 app:layout_constraintStart_toStartOf="@+id/editText_deal_title"
