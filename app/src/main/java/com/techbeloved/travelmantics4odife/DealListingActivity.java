@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
@@ -31,6 +32,7 @@ public class DealListingActivity extends AppCompatActivity {
 
     private ActivityDealListingBinding binding;
     private DealListingViewModel viewModel;
+    private TravelDealAdapter dealAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,14 @@ public class DealListingActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_deal_listing);
 
         binding.fabAddNewDeal.setOnClickListener(view -> startActivity(new Intent(this, DealActivity.class)));
+
+        dealAdapter = new TravelDealAdapter(deal -> {
+            Intent intent = new Intent(this, DealActivity.class);
+            intent.putExtra(DealActivity.ARG_DEAL, deal);
+            startActivity(intent);
+        });
+        binding.recyclerviewDeals.setLayoutManager(new LinearLayoutManager(this));
+        binding.recyclerviewDeals.setAdapter(dealAdapter);
     }
 
     @Override
@@ -70,8 +80,9 @@ public class DealListingActivity extends AppCompatActivity {
     }
 
     private void initializeDeals() {
-        DealListingViewModel.Factory factory = new DealListingViewModel.Factory(FirebaseDatabase.getInstance());
+        DealListingViewModel.Factory factory = new DealListingViewModel.Factory(FirebaseDatabase.getInstance().getReference());
         viewModel = ViewModelProviders.of(this, factory).get(DealListingViewModel.class);
+        viewModel.travelDeals().observe(this, travelDeals -> dealAdapter.submitList(travelDeals));
     }
 
 

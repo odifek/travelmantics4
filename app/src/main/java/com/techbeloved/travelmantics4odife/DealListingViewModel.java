@@ -1,27 +1,29 @@
 package com.techbeloved.travelmantics4odife;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DealListingViewModel extends ViewModel {
-    private FirebaseDatabase database;
+    private DatabaseReference database;
+
+    public static final String TAG = "DealListingViewModel";
 
     private MutableLiveData<List<TravelDeal>> travelDeals = new MutableLiveData<>();
 
-    private DealListingViewModel(FirebaseDatabase database) {
+    private DealListingViewModel(DatabaseReference database) {
         this.database = database;
         getTravelDeals();
 
@@ -32,39 +34,29 @@ public class DealListingViewModel extends ViewModel {
     }
 
     private void getTravelDeals() {
-        database.getReference("travelDeals")
-                .addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+        database.child("travelDeals").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<TravelDeal> deals = new ArrayList<>();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    TravelDeal deal = snapshot.getValue(TravelDeal.class);
+                    deals.add(deal);
+                }
+                travelDeals.postValue(deals);
+            }
 
-                    }
-
-                    @Override
-                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                    }
-
-                    @Override
-                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-                    }
-
-                    @Override
-                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "onCancelled: " + "code: " + databaseError.getCode() + ", message: " +
+                        databaseError.getMessage(), databaseError.toException());
+            }
+        });
     }
 
     static class Factory extends ViewModelProvider.NewInstanceFactory {
-        private FirebaseDatabase database;
+        private DatabaseReference database;
 
-        Factory(FirebaseDatabase database) {
+        Factory(DatabaseReference database) {
             this.database = database;
         }
 
