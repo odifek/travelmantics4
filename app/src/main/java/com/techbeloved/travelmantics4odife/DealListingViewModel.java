@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DealListingViewModel extends ViewModel {
@@ -34,7 +35,8 @@ public class DealListingViewModel extends ViewModel {
     }
 
     private void getTravelDeals() {
-        database.child("travelDeals").addValueEventListener(new ValueEventListener() {
+        database.child("travelDeals")
+                .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<TravelDeal> deals = new ArrayList<>();
@@ -42,6 +44,8 @@ public class DealListingViewModel extends ViewModel {
                     TravelDeal deal = snapshot.getValue(TravelDeal.class);
                     deals.add(deal);
                 }
+                // Sort by date added descending
+                Collections.sort(deals, (d1, d2) -> d2.getId().compareTo(d1.getId()));
                 travelDeals.postValue(deals);
             }
 
