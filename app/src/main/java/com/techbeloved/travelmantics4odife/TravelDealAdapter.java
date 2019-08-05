@@ -1,9 +1,6 @@
 package com.techbeloved.travelmantics4odife;
 
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -12,7 +9,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.techbeloved.travelmantics4odife.databinding.ItemDealBinding;
 
 import java.util.Objects;
@@ -53,13 +50,11 @@ public class TravelDealAdapter extends ListAdapter<TravelDeal, TravelDealAdapter
         holder.binding.textViewDealDescription.setText(deal.getDescription());
         holder.binding.textViewDealPrice.setText(deal.getPrice());
 
-        String imageUrl = TextUtils.isEmpty(deal.getImageUrl()) ? null : deal.getImageUrl();
-        Picasso.with(holder.binding.getRoot().getContext())
-                .load(imageUrl)
+        Glide.with(holder.binding.getRoot().getContext())
+                .load(deal.getImageUrl())
                 .placeholder(R.drawable.ic_power)
                 .error(R.drawable.ic_error)
                 .centerCrop()
-                .resize(120, 120)
                 .into(holder.binding.imageViewDealPhoto);
         holder.binding.getRoot().setOnClickListener(view -> clickListener.onItemClick(deal));
     }
