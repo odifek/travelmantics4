@@ -138,7 +138,7 @@ public class DealActivity extends AppCompatActivity {
             binding.editTextDealDescription.setKeyListener(null);
             binding.editTextDealTitle.setKeyListener(null);
         }
-        binding.buttonUploadImage.setEnabled(enable);
+        binding.buttonUploadImage.setVisibility(View.INVISIBLE);
         isAdmin = enable;
         invalidateOptionsMenu();
     }
@@ -230,7 +230,7 @@ public class DealActivity extends AppCompatActivity {
                 .load(imageUrl)
                 .placeholder(R.drawable.ic_power)
                 .error(R.drawable.ic_error)
-                .centerCrop()
+                .fitCenter()
                 .into(binding.imageViewDealPhoto);
     }
 

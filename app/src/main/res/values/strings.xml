@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Travelmantics 4 Odife</string>
+    <string name="app_name">Travelmatics 4</string>
     <string name="description_deal_image">Deal Image</string>
     <string name="deal_title">Title</string>
     <string name="description">Description</string>
@@ -7,4 +7,6 @@
     <string name="upload_image">Upload Image</string>
     <string name="save">Save</string>
     <string name="storage_reference_deals_pictures" translatable="false">deals_pictures</string>
+
+    <string name="format_price">$%.02f</string>
 </resources>

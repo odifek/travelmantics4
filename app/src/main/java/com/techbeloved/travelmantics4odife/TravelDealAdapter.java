@@ -48,13 +48,19 @@ public class TravelDealAdapter extends ListAdapter<TravelDeal, TravelDealAdapter
         TravelDeal deal = getItem(position);
         holder.binding.textViewDealTitle.setText(deal.getTitle());
         holder.binding.textViewDealDescription.setText(deal.getDescription());
-        holder.binding.textViewDealPrice.setText(deal.getPrice());
+
+        double price;
+        try {
+             price = Double.valueOf(deal.getPrice());
+        } catch (Exception e) {
+            price = 0.00;
+        }
+        holder.binding.textViewDealPrice.setText(holder.itemView.getContext().getString(R.string.format_price, price));
 
         Glide.with(holder.binding.getRoot().getContext())
                 .load(deal.getImageUrl())
                 .placeholder(R.drawable.ic_power)
                 .error(R.drawable.ic_error)
-                .centerCrop()
                 .into(holder.binding.imageViewDealPhoto);
         holder.binding.getRoot().setOnClickListener(view -> clickListener.onItemClick(deal));
     }
