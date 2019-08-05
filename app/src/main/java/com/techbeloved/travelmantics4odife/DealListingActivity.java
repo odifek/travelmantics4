@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +14,10 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.techbeloved.travelmantics4odife.databinding.ActivityDealListingBinding;
 
 public class DealListingActivity extends AppCompatActivity {
@@ -40,6 +44,7 @@ public class DealListingActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_deal_listing);
 
         binding.fabAddNewDeal.setOnClickListener(view -> startActivity(new Intent(this, DealActivity.class)));
+
 
         dealAdapter = new TravelDealAdapter(deal -> {
             Intent intent = new Intent(this, DealActivity.class);
@@ -83,6 +88,27 @@ public class DealListingActivity extends AppCompatActivity {
         DealListingViewModel.Factory factory = new DealListingViewModel.Factory(FirebaseDatabase.getInstance().getReference());
         viewModel = ViewModelProviders.of(this, factory).get(DealListingViewModel.class);
         viewModel.travelDeals().observe(this, travelDeals -> dealAdapter.submitList(travelDeals));
+
+        String userId = firebaseAuth.getUid();
+        if (userId != null) {
+            FirebaseDatabase.getInstance().getReference().child("administrators")
+                    .child(userId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                binding.fabAddNewDeal.setVisibility(View.VISIBLE);
+                            } else {
+                                binding.fabAddNewDeal.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            binding.fabAddNewDeal.setVisibility(View.GONE);
+                        }
+                    });
+        }
     }
 
 

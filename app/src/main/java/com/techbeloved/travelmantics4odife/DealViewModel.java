@@ -17,23 +17,22 @@ public class DealViewModel extends ViewModel {
 
     private static final String TAG = "DealViewModel";
 
-    private DatabaseReference database;
+    private DatabaseReference travelDealReference;
 
     private MutableLiveData<Status> dealSavingStatus = new MutableLiveData<>();
     private ExecutorService executor;
 
     private DealViewModel(DatabaseReference database, ExecutorService executor) {
-        this.database = database;
         this.executor = executor;
+        this.travelDealReference = database.child("travelDeals");
     }
 
     void saveDeal(TravelDeal deal) {
         if (TextUtils.isEmpty(deal.getId())) {
-            String key = database.child("travelDeals").push().getKey();
+            String key = travelDealReference.push().getKey();
             deal.setId(key);
         }
-        database.child("travelDeals")
-                .child(deal.getId())
+        travelDealReference.child(deal.getId())
                 .setValue(deal)
                 .addOnSuccessListener(executor, aVoid -> {
                     Log.i(TAG, "saveDeal: success");
@@ -41,10 +40,22 @@ public class DealViewModel extends ViewModel {
                 })
                 .addOnFailureListener(executor, e -> {
                     Log.w(TAG, "saveDeal: failed!", e);
-                      dealSavingStatus.postValue(Status.errorSaving(e));
-                      dealSavingStatus.postValue(Status.defaultVal());
+                    dealSavingStatus.postValue(Status.errorSaving(e));
+                    dealSavingStatus.postValue(Status.defaultVal());
                 });
 
+    }
+
+    void deleteDeal(TravelDeal currentDeal) {
+        travelDealReference.child(currentDeal.getId())
+                .removeValue((databaseError, databaseReference) -> {
+                    if (databaseError != null) {
+                        Log.w(TAG, "deleteDeal: Error deleting deal!", databaseError.toException());
+                        dealSavingStatus.postValue(Status.errorSaving(databaseError.toException()));
+                    } else {
+                        dealSavingStatus.postValue(Status.savedSuccess());
+                    }
+                });
     }
 
     LiveData<Status> dealStatus() {

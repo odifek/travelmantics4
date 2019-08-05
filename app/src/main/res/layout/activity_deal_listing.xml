@@ -34,6 +34,7 @@
             android:clickable="true"
             android:focusable="true"
             android:src="@android:drawable/ic_input_add"
+            android:visibility="gone"
             app:backgroundTint="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

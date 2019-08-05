@@ -6,10 +6,12 @@
         android:id="@+id/menu_save_deal"
         android:icon="@drawable/ic_save"
         android:title="@string/save"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:visible="false"/>
     <item
         android:id="@+id/menu_delete_deal"
         android:icon="@drawable/ic_delete"
         android:title="Delete"
-        app:showAsAction="never" />
+        app:showAsAction="never"
+        android:visible="false"/>
 </menu>

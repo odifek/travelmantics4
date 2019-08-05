@@ -6,15 +6,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.app.usage.NetworkStats;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.techbeloved.travelmantics4odife.databinding.ActivityDealBinding;
 
@@ -31,6 +37,8 @@ public class DealActivity extends AppCompatActivity {
     private DealViewModel viewModel;
     @Nullable
     private TravelDeal currentDeal;
+
+    private boolean isAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +68,43 @@ public class DealActivity extends AppCompatActivity {
             currentDeal = getIntent().getParcelableExtra(ARG_DEAL);
             if (currentDeal != null) populateDeal(currentDeal);
         }
+
+        adminChecks();
+    }
+
+    private void adminChecks() {
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        String userId = firebaseAuth.getUid();
+        if (userId != null) {
+            FirebaseDatabase.getInstance().getReference().child("administrators")
+                    .child(userId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                enableAdminFeatures(true);
+                            } else {
+                                enableAdminFeatures(false);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            enableAdminFeatures(false);
+                        }
+                    });
+        }
+    }
+
+    private void enableAdminFeatures(boolean enable) {
+        if (!enable) {
+            binding.editTextDealPrice.setKeyListener(null);
+            binding.editTextDealDescription.setKeyListener(null);
+            binding.editTextDealTitle.setKeyListener(null);
+        }
+        binding.buttonUploadImage.setEnabled(enable);
+        isAdmin = enable;
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -72,18 +117,30 @@ public class DealActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.deal, menu);
+        menu.findItem(R.id.menu_delete_deal).setVisible(isAdmin);
+        menu.findItem(R.id.menu_save_deal).setVisible(isAdmin);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menu_save_deal) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.menu_save_deal) {
             checkDealDetailsAndSave();
             return true;
+        } else if (itemId == R.id.menu_delete_deal) {
+            if (currentDeal != null) {
+                viewModel.deleteDeal(currentDeal);
+            } else {
+                finish();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Verifies that details are entered correctly after which it saves the deal.
+     */
     private void checkDealDetailsAndSave() {
         if (!TextUtils.isEmpty(binding.editTextDealTitle.getText())) {
             String title = binding.editTextDealTitle.getText().toString();
