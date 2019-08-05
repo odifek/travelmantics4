@@ -138,7 +138,11 @@ public class DealActivity extends AppCompatActivity {
             binding.editTextDealDescription.setKeyListener(null);
             binding.editTextDealTitle.setKeyListener(null);
         }
-        binding.buttonUploadImage.setVisibility(View.INVISIBLE);
+        if (enable) {
+            binding.buttonUploadImage.setVisibility(View.VISIBLE);
+        } else {
+            binding.buttonUploadImage.setVisibility(View.INVISIBLE);
+        }
         isAdmin = enable;
         invalidateOptionsMenu();
     }
